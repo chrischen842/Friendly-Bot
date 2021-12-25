@@ -3,9 +3,18 @@ import os
 import requests
 import json
 import random
+import music
 from replit import db
+from discord.ext import commands
 
 client = discord.Client()
+
+cogs = [music]
+
+cl = commands.Bot(command_prefix = '!', intents = discord.Intents.all())
+
+for i in range(len(cogs)):
+  cogs[i].setup(cl)
 
 sad = ["sad", "unhappy", 'depressed', 'mad', 'angry', 'kys', 'unlucky', 'unlucko', 'sadge', 'smoge']
 
@@ -74,4 +83,22 @@ async def on_message(message):
       encouragements = db['encouragements']
     await message.channel.send(encouragements)
 
+  if msg.startswith('!list'):
+    encouragements = []
+    if 'encouragements' in db.keys():
+      encouragements = db['encouragements']
+    await message.channel.send(encouragements)
+  
+  if msg.startswith('!responding'):
+    value = msg.split('!responding ',1)[1]
+
+    if value.lower() == 'true':
+      db['responding'] = True
+      await message.channel.send("Responding is on.")
+
+    else:
+      db['responding'] = False
+      await message.channel.send("Responding is off.")
+
 client.run(os.getenv('TOKEN'))
+cl.run(os.getenv('TOKEN'))
