@@ -3,18 +3,10 @@ import os
 import requests
 import json
 import random
-import music
+from stayOnline import stayOnline
 from replit import db
-from discord.ext import commands
 
 client = discord.Client()
-
-cogs = [music]
-
-cl = commands.Bot(command_prefix = '!', intents = discord.Intents.all())
-
-for i in range(len(cogs)):
-  cogs[i].setup(cl)
 
 sad = ["sad", "unhappy", 'depressed', 'mad', 'angry', 'kys', 'unlucky', 'unlucko', 'sadge', 'smoge']
 
@@ -95,10 +87,9 @@ async def on_message(message):
     if value.lower() == 'true':
       db['responding'] = True
       await message.channel.send("Responding is on.")
-
     else:
       db['responding'] = False
       await message.channel.send("Responding is off.")
 
+stayOnline()
 client.run(os.getenv('TOKEN'))
-cl.run(os.getenv('TOKEN'))
