@@ -8,14 +8,27 @@ from replit import db
 
 client = discord.Client()
 
-sad = ["sad", "unhappy", 'depressed', 'mad', 'angry', 'kys', 'unlucky', 'unlucko', 'sadge', 'smoge']
+sad = [
+"sad",
+"unhappy",
+'depressed',
+'mad',
+'angry',
+'kys',
+'unlucky',
+'unlucko',
+'sadge',
+'smoge',
+':c',
+':('
+]
 
 encourage = [
   "Hang in there pal!",
   "You'll get'em next time :)",
   "Do not fret, you are the best!",
   "You are a great person/bot!",
-  "Do not worry, I still love you"
+  "Do not worry, I still love you!"
 ]
 
 def get_quote():
@@ -23,6 +36,20 @@ def get_quote():
   json_data = json.loads(response.text)
   quote = json_data[0]['q'] + " -" + json_data[0]['a']
   return (quote)
+
+def update_sad(sad_msg):
+  if 'saddb' in db.keys():
+    saddb = db['saddb']
+    saddb.append(sad_msg)
+    db['saddb'] = saddb
+  else:
+    db['saddb'] = [sad_msg]
+
+def remove_sad(sadindex):
+  saddb = db['saddb']
+  if len(saddb) > sadindex:
+    del saddb[sadindex]
+    db['saddb'] = saddb
 
 def update_encourage(encourage_msg):
   if "encouragements" in db.keys():
@@ -54,42 +81,71 @@ async def on_message(message):
     quote = get_quote()
     await message.channel.send(quote)
 
+  sadwordbank = sad
+  if 'saddb' in db.keys():
+    sadwordbank = sadwordbank + list(db['saddb'])
+
   options = encourage
   if 'encouragements' in db.keys():
     options = options + list(db['encouragements'])
 
-  if any(word in msg for word in sad):
+  if any(word in msg for word in sadwordbank):
     await message.channel.send(random.choice(options))
 
-  if msg.startswith('!new'):
-    encourage_msg = msg.split('!new ',1)[1]
+  if msg.startswith('!new e'):
+    encourage_msg = msg.split('!new e ',1)[1]
     update_encourage(encourage_msg)
     await message.channel.send('New encouragement added!')
+  
+  if msg.startswith('!new s'):
+    sad_msg = msg.split('!new s ',1)[1]
+    update_sad(sad_msg)
+    await message.channel.send('New sad keyword added!')
     
   
-  if msg.startswith('!del'):
+  if msg.startswith('!del e'):
     encouragements = []
     if 'encouragements' in db.keys():
-      index = int(msg.split('!del',1)[1])
+      index = int(msg.split('!del e',1)[1])
       remove_encourage(index)
       encouragements = db['encouragements']
     await message.channel.send(encouragements)
+    await message.channel.send('Item deleted.')
+
+  if msg.startswith('!del s'):
+    saddb = []
+    if 'saddb' in db.keys():
+      sadindex = int(msg.split('!del s',1)[1])
+      remove_sad(sadindex)
+      saddb = db['saddb']
+    await message.channel.send(saddb)
+    await message.channel.send('Item deleted.')
 
   if msg.startswith('!list'):
     encouragements = []
+    saddb = []
     if 'encouragements' in db.keys():
       encouragements = db['encouragements']
-    await message.channel.send(encouragements)
-  
-  if msg.startswith('!responding'):
-    value = msg.split('!responding ',1)[1]
+    
+    if 'saddb' in db.keys():
+      saddb = db['saddb']
 
-    if value.lower() == 'true':
-      db['responding'] = True
-      await message.channel.send("Responding is on.")
+    await message.channel.send('Encouragement wordbank:')
+    await message.channel.send(encouragements)
+    await message.channel.send('Sad wordbank:')
+    await message.channel.send(saddb)
+  
+  if msg.startswith('!turn'):
+    value = msg.split('!turn ',1)[1]
+
+    if value.lower() == 'on':
+      db['turn'] = True
+      await message.channel.send("I am on.")
+    elif value.lower() == 'off':
+      db['turn'] = False
+      await message.channel.send("I am off.")
     else:
-      db['responding'] = False
-      await message.channel.send("Responding is off.")
+      await message.channel.send("Invalid answer.")
 
 stayOnline()
 client.run(os.getenv('TOKEN'))
