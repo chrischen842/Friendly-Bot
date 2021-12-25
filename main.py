@@ -83,11 +83,12 @@ async def on_message(message):
 
   sadwordbank = sad
   if 'saddb' in db.keys():
-    sadwordbank = sadwordbank + list(db['saddb'])
+    sadwordbank.extend(db["saddb"])
 
   options = encourage
   if 'encouragements' in db.keys():
-    options = options + list(db['encouragements'])
+    options.extend(db["encouragements"])
+
 
   if any(word in msg for word in sadwordbank):
     await message.channel.send(random.choice(options))
@@ -103,23 +104,23 @@ async def on_message(message):
     await message.channel.send('New sad keyword added!')
     
   
-  if msg.startswith('!del e'):
+  if msg.startswith('!remove e'):
     encouragements = []
     if 'encouragements' in db.keys():
-      index = int(msg.split('!del e',1)[1])
+      index = int(msg.split('!remove e',1)[1])
       remove_encourage(index)
       encouragements = db['encouragements']
-    await message.channel.send(encouragements)
     await message.channel.send('Item deleted.')
+    await message.channel.send(encouragements)
 
-  if msg.startswith('!del s'):
+  if msg.startswith('!remove s'):
     saddb = []
     if 'saddb' in db.keys():
-      sadindex = int(msg.split('!del s',1)[1])
+      sadindex = int(msg.split('!remove s',1)[1])
       remove_sad(sadindex)
       saddb = db['saddb']
-    await message.channel.send(saddb)
     await message.channel.send('Item deleted.')
+    await message.channel.send(saddb)
 
   if msg.startswith('!list'):
     encouragements = []
