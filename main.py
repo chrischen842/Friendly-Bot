@@ -68,6 +68,9 @@ def remove_encourage(index):
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
+  for k in db.keys():
+    print (db[k])
+
 
 @client.event
 async def on_message(message):
@@ -89,7 +92,6 @@ async def on_message(message):
   if 'encouragements' in db.keys():
     options.extend(db["encouragements"])
 
-
   if any(word in msg for word in sadwordbank):
     await message.channel.send(random.choice(options))
 
@@ -103,7 +105,6 @@ async def on_message(message):
     update_sad(sad_msg)
     await message.channel.send('New sad keyword added!')
     
-  
   if msg.startswith('!remove e'):
     encouragements = []
     if 'encouragements' in db.keys():
@@ -147,6 +148,6 @@ async def on_message(message):
       await message.channel.send("I am off.")
     else:
       await message.channel.send("Invalid answer.")
-
+  
 stayOnline()
 client.run(os.getenv('TOKEN'))
